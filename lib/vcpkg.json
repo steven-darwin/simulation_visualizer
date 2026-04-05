@@ -1,0 +1,17 @@
+{
+    "dependencies": [
+        {
+            "name": "glfw3"
+        },
+        {
+            "name": "glm"
+        },
+        {
+            "name": "nlohmann-json"
+        },
+        {
+            "name": "imgui",
+            "features": [ "glfw-binding", "vulkan-binding" ]
+        }
+    ]
+}
