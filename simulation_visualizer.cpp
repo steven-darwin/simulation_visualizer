@@ -1,19 +1,12 @@
 ﻿#include <iostream>
 #include <stdexcept>
 
-#include "core/VszrCore.hpp"
+#include "setup/VszrZoning.hpp"
 
-int main() {
-    try {
-        VszrCore app{};
-        app.init();
-        app.run();
-        app.clean();
-    }
-    catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+int main(int argc, char* argv[]) {
+    VszrZoning vszr_setup_program(argv[1]);
+    vszr_setup_program.setupPhase();
+    vszr_setup_program.executionPhase();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

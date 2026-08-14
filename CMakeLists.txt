@@ -32,11 +32,13 @@ set(PROJECT_SOURCES
     ../../src/geometry-topology/GeometryTopologyWire.cpp
     ../../src/geometry-topology/GeometryTopologyEdge.cpp
     ../../src/geometry-topology/GeometryTopologyVertex.cpp
+    ../../src/utility/ConfigReader.cpp
     src/core/VszrCore.cpp
     src/core/VszrDevice.cpp
     src/core/VszrPresentation.cpp
     src/core/VszrGraphics.cpp
     src/core/VszrUtility.cpp
+    src/setup/VszrZoning.cpp
 )
 
 add_executable (${PROJECT_NAME} ${PROJECT_SOURCES}) 
