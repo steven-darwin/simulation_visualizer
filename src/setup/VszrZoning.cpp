@@ -25,26 +25,13 @@ using json = nlohmann::json;
 #include "utility/ConfigReader.hpp"
 
 #include "setup/VszrZoning.hpp"
-
-VszrZoning::VszrZoning() {
-    // TBA
-}
-
-VszrZoning::VszrZoning(const char* runtime_config_file_path) {
-    _runtimeConfigFilePath = runtime_config_file_path;
-}
-
-VszrZoning::~VszrZoning() {
-    // TBA
-}
+#include "report/VszrReport.hpp"
 
 void VszrZoning::setupPhase() {
-    ConfigReader config_reader;
-
     std::string zone_json_file_path =
-        config_reader.getRuntimeConfigValue(_runtimeConfigFilePath, "scmp", "staging_directory_path") +
+        ConfigReader::instance().getRuntimeConfigValue("scmp", "staging_directory_path") +
         "/" +
-        config_reader.getRuntimeConfigValue(_runtimeConfigFilePath, "scmp", "file_name_prefix") +
+        ConfigReader::instance().getRuntimeConfigValue("scmp", "file_name_prefix") +
         "_" +
         "zone.json";
 
@@ -139,12 +126,12 @@ void VszrZoning::setupPhase() {
 }
 
 void VszrZoning::executionPhase() {
-    ConfigReader config_reader;
+    VszrReport::instance().addTimePoint("file_preparation_begin", std::chrono::system_clock::now());
 
     std::string zone_json_file_path =
-        config_reader.getRuntimeConfigValue(_runtimeConfigFilePath, "scmp", "staging_directory_path") +
+        ConfigReader::instance().getRuntimeConfigValue("scmp", "staging_directory_path") +
         "/" +
-        config_reader.getRuntimeConfigValue(_runtimeConfigFilePath, "scmp", "file_name_prefix") +
+        ConfigReader::instance().getRuntimeConfigValue("scmp", "file_name_prefix") +
         "_" +
         "zone.json";
 
@@ -154,11 +141,6 @@ void VszrZoning::executionPhase() {
 
     std::ifstream raw_zone(zone_buffer);
     std::vector<json> parsed_zone = json::parse(raw_zone).at("zone").get<std::vector<json>>();
-
-    /*std::unordered_set<std::array<uint8_t, 16>, InputHDF5Adapter::UUIDHash> zone_entity_list;
-    for (auto zone_iter = parsed_zone.begin(); zone_iter != parsed_zone.end(); zone_iter++) {
-        zone_entity_list.insert(zone_iter->at("entity_id").get<std::array<uint8_t, 16>>());
-    }*/
 
     InputHDF5Adapter::ParameterMetadata input_computational_grid_parameter = {
         "computational_grid",
@@ -177,6 +159,8 @@ void VszrZoning::executionPhase() {
 
         std::vector<json> parameter_list = zone_iter->at("visualization").get<std::vector<json>>();
         for (auto parameter_iter = parameter_list.begin(); parameter_iter != parameter_list.end(); parameter_iter++) {
+            VszrReport::instance().setVisualizerConfig(zone_iter->at("name").get<std::string>(), parameter_iter->at("parameter").get<std::string>());
+            
             InputHDF5Adapter::ParameterMetadata input_temperature_parameter = {
                 parameter_iter->at("parameter").get<std::string>(),
                 {1},
@@ -193,9 +177,12 @@ void VszrZoning::executionPhase() {
             std::vector<std::string> source_file_list = parameter_iter->at("source_file_suffix").get<std::vector<std::string>>();
             
             for (auto source_file_iter = source_file_list.begin(); source_file_iter != source_file_list.end(); source_file_iter++) {
-                InputHDF5Adapter internal_input_hdf5_adapter(_runtimeConfigFilePath, (*source_file_iter));
+                InputHDF5Adapter internal_input_hdf5_adapter((*source_file_iter));
                 internal_input_hdf5_adapter.addSolverParameter({ input_computational_grid_parameter, input_temperature_parameter });
                 std::vector<std::shared_ptr<GeometryTopology>> recreated_neutral_topology_list = internal_input_hdf5_adapter.deserialize();
+
+                VszrReport::instance().addTimePoint("slvr_item" + std::to_string(file_counter) + "_in", std::chrono::system_clock::now());
+                VszrReport::instance().addFileSuffix("in", (*source_file_iter), "h5");
 
                 for (auto entity_iter = recreated_neutral_topology_list.begin(); entity_iter != recreated_neutral_topology_list.end(); entity_iter++) {
                     if ((*entity_iter)->getID() == zone_iter->at("entity_id").get<std::array<uint8_t, 16>>()) {
@@ -203,9 +190,15 @@ void VszrZoning::executionPhase() {
                         output_file_suffix += ".item";
                         output_file_suffix += std::to_string(file_counter);
 
-                        OutputXDMFAdapter internal_output_xdmf_adapter(_runtimeConfigFilePath, output_file_suffix);
+                        OutputXDMFAdapter internal_output_xdmf_adapter(output_file_suffix);
                         internal_output_xdmf_adapter.addSolverParameter({ output_computational_grid_parameter, output_temperature_parameter });
                         internal_output_xdmf_adapter.serialize((*entity_iter));
+
+                        VszrReport::instance().addTimePoint("vszr_item" + std::to_string(file_counter) + "_out", std::chrono::system_clock::now());
+                        VszrReport::instance().addFileSuffix("out", output_file_suffix, "xmf");
+                        VszrReport::instance().addFileSuffix("out", output_file_suffix, "h5");
+
+                        VszrReport::instance().addFileMapping((*source_file_iter), output_file_suffix);
 
                         file_counter++;
                 
@@ -215,4 +208,6 @@ void VszrZoning::executionPhase() {
             }
         }
     }
+
+    VszrReport::instance().addTimePoint("file_preparation_finish", std::chrono::system_clock::now());
 }

@@ -39,6 +39,7 @@ set(PROJECT_SOURCES
     src/core/VszrGraphics.cpp
     src/core/VszrUtility.cpp
     src/setup/VszrZoning.cpp
+    src/report/VszrReport.cpp
 )
 
 add_executable (${PROJECT_NAME} ${PROJECT_SOURCES}) 

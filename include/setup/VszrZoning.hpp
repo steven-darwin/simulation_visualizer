@@ -18,17 +18,16 @@ class VszrZoning {
 public:
 
     /** Constructor of VszrZoning object */
-    VszrZoning();
-    VszrZoning(const char* runtime_config_file_path);
+    VszrZoning() = default;
 
     /** Destructor of MeshZoning object */
-    ~VszrZoning();
+    ~VszrZoning() = default;
 
     void setupPhase();
     void executionPhase();
 
 private:
-    const char* _runtimeConfigFilePath;
+
 };
 
 #endif
