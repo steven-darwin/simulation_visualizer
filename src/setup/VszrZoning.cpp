@@ -48,6 +48,7 @@ void VszrZoning::setupPhase() {
     while (setup_zone) {
         std::string is_zone_being_added;
 
+        std::cout << std::endl;
         std::cout << "Adding Zone and Parameter to Visualize? (Y/N)" << std::endl;
         std::cin >> is_zone_being_added;
 
@@ -123,9 +124,13 @@ void VszrZoning::setupPhase() {
     std::ofstream modified_zone(zone_buffer);
     modified_zone << std::setw(4) << full_zone_data << std::endl;
     modified_zone.close();
+
+    std::cout << std::endl;
 }
 
 void VszrZoning::executionPhase() {
+    unsigned int progress = 0;
+
     VszrReport::instance().addTimePoint("file_preparation_begin", std::chrono::system_clock::now());
 
     std::string zone_json_file_path =
@@ -154,6 +159,14 @@ void VszrZoning::executionPhase() {
         GeometryTopology::Type::VERTEX
     };
 
+    unsigned int visualization_zone_total = 0;
+    for (auto zone_iter = parsed_zone.begin(); zone_iter != parsed_zone.end(); zone_iter++) {
+        if (zone_iter->contains("visualization")) {
+            visualization_zone_total++;
+        }
+    }
+
+    unsigned int visualization_counter = 0;
     for (auto zone_iter = parsed_zone.begin(); zone_iter != parsed_zone.end(); zone_iter++) {
         if (!zone_iter->contains("visualization")) continue;
 
@@ -205,8 +218,13 @@ void VszrZoning::executionPhase() {
                         break;
                     }
                 }
+
+                progress = 0 + (visualization_counter / visualization_zone_total * 100) + ((file_counter - 1) / static_cast<double>(source_file_list.size() / visualization_zone_total) * 100);
+                std::cout << "\r" << "Processing Visualized Zone " << std::string(static_cast<size_t>(std::floor(progress / 10)), '=') << "> " << progress << "%";
             }
         }
+
+        visualization_counter++;
     }
 
     VszrReport::instance().addTimePoint("file_preparation_finish", std::chrono::system_clock::now());
