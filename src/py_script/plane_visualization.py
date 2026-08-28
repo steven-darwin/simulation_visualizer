@@ -4,8 +4,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import h5py
 import matplotlib.animation as animation
 import json
+import sys
 
-runtime_config_file_path = "C:/Users/steve/OneDrive/Stuff/ProjectAndPortofolio/009_ScientificComputing/scientific_computing/build/staging/slab_config.json"
+runtime_config_file_path = sys.argv[1]
 
 with open(runtime_config_file_path) as runtime_config_file:
     runtime_config = json.load(runtime_config_file)

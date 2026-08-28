@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 #include "utility/ConfigReader.hpp"
-#include "setup/VszrZoning.hpp"
+#include "setup/VszrZone.hpp"
 #include "report/VszrReport.hpp"
 
 int main(int argc, char* argv[]) {
@@ -10,9 +10,8 @@ int main(int argc, char* argv[]) {
 
     VszrReport::instance().addTimePoint("start_execution", std::chrono::system_clock::now());
 
-    VszrZoning vszr_setup_program;
-    vszr_setup_program.setupPhase();
-    vszr_setup_program.executionPhase();
+    VszrZone::instance().setup();
+    VszrZone::instance().run();
 
     VszrReport::instance().addTimePoint("end_execution", std::chrono::system_clock::now());
 

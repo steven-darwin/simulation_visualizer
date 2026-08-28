@@ -1,5 +1,5 @@
 /**
- * @file VszrZoning.cpp
+ * @file VszrZone.cpp
  * @author Steven Darwin
  * @version 0.0.1
  * @date Created : 2026-08-11
@@ -24,10 +24,15 @@ using json = nlohmann::json;
 #include "geometry-topology/GeometryTopology.hpp"
 #include "utility/ConfigReader.hpp"
 
-#include "setup/VszrZoning.hpp"
+#include "setup/VszrZone.hpp"
 #include "report/VszrReport.hpp"
 
-void VszrZoning::setupPhase() {
+VszrZone& VszrZone::instance() {
+    static VszrZone singleton;
+    return singleton;
+}
+
+void VszrZone::setup() {
     std::string zone_json_file_path =
         ConfigReader::instance().getRuntimeConfigValue("scmp", "staging_directory_path") +
         "/" +
@@ -128,7 +133,7 @@ void VszrZoning::setupPhase() {
     std::cout << std::endl;
 }
 
-void VszrZoning::executionPhase() {
+void VszrZone::run() {
     unsigned int progress = 0;
 
     VszrReport::instance().addTimePoint("file_preparation_begin", std::chrono::system_clock::now());
@@ -190,9 +195,9 @@ void VszrZoning::executionPhase() {
             std::vector<std::string> source_file_list = parameter_iter->at("source_file_suffix").get<std::vector<std::string>>();
             
             for (auto source_file_iter = source_file_list.begin(); source_file_iter != source_file_list.end(); source_file_iter++) {
-                InputHDF5Adapter internal_input_hdf5_adapter((*source_file_iter));
+                InputHDF5Adapter internal_input_hdf5_adapter;
                 internal_input_hdf5_adapter.addSolverParameter({ input_computational_grid_parameter, input_temperature_parameter });
-                std::vector<std::shared_ptr<GeometryTopology>> recreated_neutral_topology_list = internal_input_hdf5_adapter.deserialize();
+                std::vector<std::shared_ptr<GeometryTopology>> recreated_neutral_topology_list = internal_input_hdf5_adapter.deserialize((*source_file_iter));
 
                 VszrReport::instance().addTimePoint("slvr_item" + std::to_string(file_counter) + "_in", std::chrono::system_clock::now());
                 VszrReport::instance().addFileSuffix("in", (*source_file_iter), "h5");
@@ -203,9 +208,9 @@ void VszrZoning::executionPhase() {
                         output_file_suffix += ".item";
                         output_file_suffix += std::to_string(file_counter);
 
-                        OutputXDMFAdapter internal_output_xdmf_adapter(output_file_suffix);
+                        OutputXDMFAdapter internal_output_xdmf_adapter;
                         internal_output_xdmf_adapter.addSolverParameter({ output_computational_grid_parameter, output_temperature_parameter });
-                        internal_output_xdmf_adapter.serialize((*entity_iter));
+                        internal_output_xdmf_adapter.serialize((*entity_iter), output_file_suffix);
 
                         VszrReport::instance().addTimePoint("vszr_item" + std::to_string(file_counter) + "_out", std::chrono::system_clock::now());
                         VszrReport::instance().addFileSuffix("out", output_file_suffix, "xmf");

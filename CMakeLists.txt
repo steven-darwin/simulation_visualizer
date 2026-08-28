@@ -38,7 +38,7 @@ set(PROJECT_SOURCES
     src/core/VszrPresentation.cpp
     src/core/VszrGraphics.cpp
     src/core/VszrUtility.cpp
-    src/setup/VszrZoning.cpp
+    src/setup/VszrZone.cpp
     src/report/VszrReport.cpp
 )
 

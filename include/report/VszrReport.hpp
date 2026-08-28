@@ -19,7 +19,7 @@
 #include <chrono>
 
 #include "geometry-topology/GeometryTopology.hpp"
-#include "setup/VszrZoning.hpp"
+#include "setup/VszrZone.hpp"
 
 class VszrReport {
 public:
