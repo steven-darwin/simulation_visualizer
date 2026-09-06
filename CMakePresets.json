@@ -7,10 +7,14 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/../../build/simulation_visualizer",
       "installDir": "${sourceDir}/../../install/simulation_visualizer",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl.exe",
-        "CMAKE_CXX_COMPILER": "cl.exe"
-      },
+        "cacheVariables": {
+            "CMAKE_C_COMPILER": "cl.exe",
+            "CMAKE_CXX_COMPILER": "cl.exe",
+            "VCPKG_INSTALLED_DIR": "${sourceDir}/lib/vcpkg_installed",
+            "VCPKG_MANIFEST_DIR": "${sourceDir}/lib",
+            "VCPKG_MANIFEST_MODE": "ON",
+            "VCPKG_MANIFEST_INSTALL": "ON"
+        },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",

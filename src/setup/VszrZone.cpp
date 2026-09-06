@@ -203,7 +203,7 @@ void VszrZone::run() {
                 VszrReport::instance().addFileSuffix("in", (*source_file_iter), "h5");
 
                 for (auto entity_iter = recreated_neutral_topology_list.begin(); entity_iter != recreated_neutral_topology_list.end(); entity_iter++) {
-                    if ((*entity_iter)->getID() == zone_iter->at("entity_id").get<std::array<uint8_t, 16>>()) {
+                    if ((*entity_iter)->getID() == zone_iter->at("entity_id").get<UUID>()) {
                         std::string output_file_suffix = zone_iter->at("name").get<std::string>();
                         output_file_suffix += ".item";
                         output_file_suffix += std::to_string(file_counter);

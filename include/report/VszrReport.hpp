@@ -44,7 +44,7 @@ private:
     std::vector<std::tuple<std::string, std::string, std::string>> _fileSuffixList;
     std::vector<std::tuple<std::string, std::string>> _fileMappingList;
 
-    std::string paddingCenteredString(std::string text, std::string padding_char, unsigned int line_width);
+    std::string paddingString(std::string text, std::string padding_char, unsigned int line_width, std::string align_direction);
 };
 
 #endif

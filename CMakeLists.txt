@@ -33,11 +33,11 @@ set(PROJECT_SOURCES
     ../../src/geometry-topology/GeometryTopologyEdge.cpp
     ../../src/geometry-topology/GeometryTopologyVertex.cpp
     ../../src/utility/ConfigReader.cpp
-    src/core/VszrCore.cpp
-    src/core/VszrDevice.cpp
-    src/core/VszrPresentation.cpp
-    src/core/VszrGraphics.cpp
-    src/core/VszrUtility.cpp
+#    src/core/VszrCore.cpp
+#    src/core/VszrDevice.cpp
+#    src/core/VszrPresentation.cpp
+#    src/core/VszrGraphics.cpp
+#    src/core/VszrUtility.cpp
     src/setup/VszrZone.cpp
     src/report/VszrReport.cpp
 )
@@ -62,6 +62,7 @@ set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};../../shared_lib/vcpkg_installed/x64
 find_package(GTest CONFIG REQUIRED)
 find_package(hdf5 CONFIG REQUIRED)
 find_package(LibXml2 REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         GTest::gtest 
@@ -71,6 +72,7 @@ target_link_libraries(${PROJECT_NAME}
         hdf5::hdf5-shared 
         hdf5::hdf5_hl-shared
         LibXml2::LibXml2
+        nlohmann_json::nlohmann_json
 )
 
 target_link_directories(${PROJECT_NAME}
@@ -96,15 +98,10 @@ target_link_libraries(${PROJECT_NAME}
 # add local vcpkg library
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         glfw
         glm::glm
-        nlohmann_json::nlohmann_json
         imgui::imgui
 )
-
-# (COPY ${PROJECT_SOURCE_DIR}/assets DESTINATION ${PROJECT_BINARY_DIR})
-# file(COPY ${PROJECT_SOURCE_DIR}/config DESTINATION ${PROJECT_BINARY_DIR})
